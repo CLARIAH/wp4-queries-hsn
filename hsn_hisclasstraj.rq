@@ -1,5 +1,6 @@
-#+ summary: hisclass over time for OPs
+#+ summary: hisclass over time for OPs including age at time of hisclass observation
 #+ note: red exclamation mark can be ignored; query works
+#+ note: to get a more accurate age 'year' at datediff can be set at 'month'
 #+ tags:
 #+      - HSN
 #+      - HISCLASS
@@ -17,21 +18,22 @@ prefix relacode: <https://iisg.amsterdam/hsn/code/RELACODE/>
 prefix hsnvocab: <https://iisg.amsterdam/hsn2013a/vocab/>
 
 
-SELECT DISTINCT ?idnr ?person ?occlab ?gebjaar ?hisclass ?ingjaar 
-	bif:datediff('year', xsd:gYear(str(?gebjaar)),xsd:gYear(str(?ingjaar))) AS ?age 
+SELECT DISTINCT ?idnr ?person ?occlab ?gebdat ?hisclass ?ingdat 
+	bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?ingdat))) AS ?age 
 
 WHERE{
   
     ?person hsndim:individualObservation ?obs .
-    ?person hsndim:individualObservation/hsndim:GEBJAR ?gebjaar .
+    ?person hsndim:individualObservation/hsndim:GEBDAT ?gebdat .
     ?person a hsn:OP .
  
     ?obs hsndim:occstring_lc ?occlab .
     ?obs hsndim:IDNR ?idnr .
     ?obs hsndim:PERSNR ?persnr .
-    ?obs hsndim:INGJAR ?ingjaar .
+    ?obs hsndim:INGDAT ?ingdat .
     ?obs hsndim:occupationalTitle ?occ2 .
     ?occ2 hsn-hisco:hisclass ?hisclass .
     
 }
 ORDER BY ?person
+#LIMIT 100
