@@ -1,0 +1,30 @@
+#+ summary: returns number of OP's (HSN research persons) by year#sex
+#+ tags:
+#+      - HSN
+#+      - OP
+#+      - observations
+
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX hsndim: <https://iisg.amsterdam/hsn/dimension/>
+PREFIX hsn: <https://iisg.amsterdam/hsn/>
+PREFIX hsn-hisco: <https://iisg.amsterdam/hsn2013a/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sdmxdim: <http://purl.org/linked-data/sdmx/2009/dimension#>
+prefix relacode: <https://iisg.amsterdam/hsn/code/RELACODE/>
+prefix hsnvocab: <https://iisg.amsterdam/hsn2013a/vocab/>
+
+SELECT ?birthyear ?sex (count(distinct ?op) as ?count)
+
+WHERE {
+    
+  ?op a hsn:OP .
+  ?op hsndim:individualObservation /hsndim:GESLACHT ?sex .
+  ?op hsndim:individualObservation /hsndim:GEBJAR ?birthyear .
+  
+  
+  
+}
+ORDER BY ASC(?birthyear)
