@@ -32,7 +32,6 @@ WHERE {
 
     ?occup hsn-hisco:hisclass ?hisclass  .
     ?hisco skos:member ?occup .
-    ?hisco skos:inScheme ?scheme .
     ?hisco <https://iisg.amsterdam/hiscam/v131/nl> ?hiscam .
 
     ?indiv hsndim:individualObservation ?relobs .
