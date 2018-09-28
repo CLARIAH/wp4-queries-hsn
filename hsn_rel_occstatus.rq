@@ -5,9 +5,9 @@
 #+      - occupation
 #+      - hisco
 #+      - hisclass
+#+      - hiscam
 
-# NB: hiscam preferable over hisclass, but timed out in earlier versions
-# maybe fixable
+# NB: large number of objects seems required to filter out  duplicate matches 
 
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -20,14 +20,20 @@ PREFIX sdmxdim: <http://purl.org/linked-data/sdmx/2009/dimension#>
 prefix dynatype: <https://iisg.amsterdam/hsn/code/DYNATYPE/>
 prefix hsnvocab: <https://iisg.amsterdam/hsn2013a/vocab/>
 
-SELECT DISTINCT  ?indiv ?occobs ?relobs ?occup ?hisclass ?occyear ?relyear ?religie ?occno ?relno  WHERE {
+
+SELECT DISTINCT  ?indiv ?occobs ?relobs ?occup ?hisclass ?hiscam ?occyear ?relyear ?religie ?occno ?relno 
+
+WHERE {
     ?indiv hsndim:individualObservation ?occobs .
     ?occobs hsndim:occupationalTitle ?occup .
     ?occobs hsndim:INGJAR ?occyear .
     ?occobs hsndim:UIGDAT ?occyear_out .
     ?occobs hsndim:INGVLGNR ?occno .
 
-    ?occup hsn-hisco:hisclass ?hisclass .
+    ?occup hsn-hisco:hisclass ?hisclass  .
+    ?hisco skos:member ?occup .
+    ?hisco skos:inScheme ?scheme .
+    ?hisco <https://iisg.amsterdam/hiscam/v131/nl> ?hiscam .
 
     ?indiv hsndim:individualObservation ?relobs .
     ?relobs hsndim:Kerkgenootschap ?religie .
