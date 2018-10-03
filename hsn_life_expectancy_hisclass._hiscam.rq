@@ -18,15 +18,13 @@ prefix relacode: <https://iisg.amsterdam/hsn/code/RELACODE/>
 prefix hsnvocab: <https://iisg.amsterdam/hsn2013a/vocab/>
 prefix volgnummer: <https://iisg.amsterdam/hsn/code/INGVLGNR/>
 
-SELECT DISTINCT ?idnr ?gebjaar ?hisclass ?hiscam ?occ ?occyear  ?ovlyear 
+
+SELECT DISTINCT ?idnr ?ovldat ?gebjaar ?hisclass ?hiscam ?occ ?occyear  ?ovlyear 
 (bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?ovldat))) AS ?age_at_death )
 (bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?occdat))) AS ?age_at_occ)
 
 WHERE{
-
-### Specify for HSN OP (reduces results)
-  # ?person a hsn:OP .
-  
+  #  ?person a hsn:OP .
     ?person hsndim:individualObservation ?life .
     ?life hsndim:GEBJAR ?gebjaar .    
     ?life hsndim:GEBDAT ?gebdat .
@@ -34,8 +32,7 @@ WHERE{
     ?life hsndim:OVLJAR ?ovlyear .
     ?life hsndim:IDNR ?idnr .
 
-  # ?person a hsn:OP .
-  
+  #  ?person a hsn:OP .
     ?person hsndim:individualObservation ?beroep .
     ?beroep hsndim:occupationalTitle ?occ .  
     ?beroep hsndim:INGDAT ?occdat .
@@ -46,17 +43,11 @@ WHERE{
     ?hisco <https://iisg.amsterdam/hiscam/v131/nl> ?hiscam .
   
 ### FILTER for difference between occupational year and year of death
-
  FILTER(bif:datediff('year', xsd:date(str(?occdat)),xsd:date(str(?ovldat))) < 20)
    
 ### FILTER for age at occupational observation
-
   FILTER(bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?occdat))) > 40)
   
 ### FILTER out unlikely matches where occupational year exceeds year of death
-
-  FILTER(bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?ovldat))) > bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?occdat))))
+  FILTER(bif:datediff('year', xsd:date(str(?gebdat)),xsd:date(str(?ovldat))) > bif:datediff('year', 			 xsd:date(str(?gebdat)),xsd:date(str(?occdat))))
 }
-### ORDER BY times out query if asking for hiscam
-
-   #ORDER BY ?idnr
