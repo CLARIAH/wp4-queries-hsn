@@ -1,0 +1,39 @@
+#+ summary: life expectancy by hisclass and birthyear 
+#+ tags:
+#+      - hsn
+#+      - life expectancy
+#+      - sex
+#+      - hisclass
+
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX hsndim: <https://iisg.amsterdam/hsn/dimension/>
+PREFIX hsn: <https://iisg.amsterdam/hsn/>
+PREFIX hsn-hisco: <https://iisg.amsterdam/hsn2013a/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sdmxdim: <http://purl.org/linked-data/sdmx/2009/dimension#>
+
+SELECT ?birthyear ?sex (avg(?deathyear - ?birthyear) / (60 * 60 * 24 * 365.25) as ?longevity) ?hisclass WHERE{
+  SELECT DISTINCT ?person ?sex ?birthyear ?deathyear ?hisclass WHERE{
+
+   ?person a hsn:OP .
+   ?person hsndim:individualObservation ?life .
+   ?life hsndim:GESLACHT ?sex .
+   ?life hsndim:GEBJAR ?birthyear .    
+   ?life hsndim:OVLJAR ?deathyear .
+
+     filter(STR(?deathyear) > "0")
+     filter(STR(?birthyear) > "0")
+    
+### Select occupational observation x years before deathyear:
+    
+#FILTER(bif:datediff('year', xsd:date(str(?occyear)),xsd:date(str(?deathyear))) <= x)
+   
+   ?person hsndim:individualObservation ?beroep .
+   ?beroep hsndim:occupationalTitle ?occ .
+   ?beroep hsndim:INGJAR ?occyear .
+   ?occ hsn-hisco:hisclass ?hisclass .
+   
+ }
+}
