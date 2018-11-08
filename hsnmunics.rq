@@ -1,0 +1,47 @@
+#+ summary: households per municipality with geo
+#+ tags:
+#+      - HSN
+#+      - geo
+#+      - nlgis
+
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix ggamco: <http://www.gemeentegeschiedenis.nl/amco/>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix ggschema: <http://www.gemeentegeschiedenis.nl/gg-schema#>
+prefix hsndim: <https://iisg.amsterdam/hsn/dimension/>
+prefix geo: <http://www.opengis.net/ont/geosparql#>
+
+select ?N ?wkt ?wktColor {
+    # What is the largest value for n?  Store it in max.
+    {
+        select (max(?N) as ?maxN) {
+            {
+                select (count(?hhobs) as ?N) ?geo where {
+                    ?hhobs skos:exactMatch  ?hsngem .
+
+                    ?hsngem ^hsndim:Gemeente / skos:exactMatch ?amco .
+
+                    ?ggem ggschema:amsterdamCode ?amco ;
+                    geo:hasGeometry ?geo .
+                }
+            }
+        }
+    }
+    {
+        select (count(?hhobs) as ?N) ?geo where {
+            ?hhobs skos:exactMatch  ?hsngem .
+
+            ?hsngem ^hsndim:Gemeente / skos:exactMatch ?amco .
+
+            ?ggem ggschema:amsterdamCode ?amco ;
+                geo:hasGeometry ?geo .
+        }
+        group by ?geo
+    }
+
+    bind(concat('viridis,', bif:log(?N) / bif:log(?maxN)) as ?wktColor) .
+    ?geo geo:asWKT ?wkt 
+}
+order by desc (?N)
+limit 300

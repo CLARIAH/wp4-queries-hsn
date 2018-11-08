@@ -1,0 +1,27 @@
+#+ summary: average number of municipalities an OP lives in
+#+ tags:
+#+      - HSN
+#+      - geo
+#+      - mobility
+
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix ggschema: <http://www.gemeentegeschiedenis.nl/gg-schema#>
+prefix hsn: <https://iisg.amsterdam/hsn/>
+prefix hsndim: <https://iisg.amsterdam/hsn/dimension/>
+prefix geo: <http://www.opengis.net/ont/geosparql#>
+
+select (AVG(?Nmunic) as ?NMbar) where{
+    {
+        select (count(distinct ?gemeente) as ?Nmunic) ?person where {
+            ?person a hsn:OP .
+            ?person hsndim:individualObservation / hsndim:GEBJAR ?birthyear ;
+                hsndim:inHousehold / hsndim:householdObservation ?hhobs .
+            
+            ?hhobs hsndim:GEMEENTE ?gemeente .
+        }
+        group by ?person
+    }
+}
+limit 10
