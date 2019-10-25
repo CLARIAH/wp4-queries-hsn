@@ -1,0 +1,52 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX hsndim: <https://iisg.amsterdam/hsn/dimension/>
+PREFIX hsn: <https://iisg.amsterdam/hsn/>
+PREFIX hsn-hisco: <https://iisg.amsterdam/hsn2013a/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sdmxdim: <http://purl.org/linked-data/sdmx/2009/dimension#>
+prefix relacode: <https://iisg.amsterdam/hsn/code/RELACODE/>
+prefix hsnvocab: <https://iisg.amsterdam/hsn2013a/vocab/>
+
+SELECT DISTINCT ?household ?mother ?birthyear_mother ?mother_in ?mother_out ?sex_child ?child ?birthyear_child ?husband ?occ ?hisco
+
+WHERE {
+    
+  ?household hsndim:containsHouseholdMember ?child .
+  ?child hsndim:individualObservation /hsndim:GEBJAR ?birthyear_child .
+  ?child hsndim:individualObservation /hsndim:relationToOP ?sex_child . # 3 = son; 4= daughter
+   
+  ?household hsndim:containsHouseholdMember ?mother .
+  ?mother hsndim:individualObservation ?obs1 .
+  ?obs1 hsndim:GEBJAR ?birthyear_mother .
+  
+  ?mother hsndim:individualObservation ?obs2 .
+  ?obs2 hsndim:relationToOP relacode:2 .
+  ?obs2 hsndim:INGJAR ?mother_in . 
+  ?obs2 hsndim:UIGJAR ?mother_out . 
+    
+  ?household hsndim:containsHouseholdMember ?husband .
+  ?husband  hsndim:individualObservation/hsndim:DYNAINHD ?dynainhd .
+  FILTER(?dynainhd = "1 = Hoofd") . 
+  ?husband  hsndim:individualObservation ?occobs .
+  ?occobs hsndim:occupationalTitle ?occ .
+  ?occobs hsndim:INGJAR ?occyear .
+      
+  ?occ hsn-hisco:hisclass ?hisclass .
+  ?hisco skos:member ?occ .
+  ?hisco skos:inScheme ?scheme .
+  ?hisco <https://iisg.amsterdam/hiscam/v131/nl> ?hiscam .
+  
+  FILTER(?birthyear_mother > "1869"^^xsd:gYear && ?birthyear_mother < "1881"^^xsd:gYear)
+  VALUES ?sex_child {relacode:3 relacode:4}
+  FILTER(?birthyear_child <= ?mother_out && ?birthyear_child >= ?mother_in )
+  FILTER(?occyear <= ?birthyear_child )
+  
+  #FILTER(?occyear < ?mother_out && ?occyear > ?mother_in )
+}
+
+#LIMIT 1000
+  
+
+  
